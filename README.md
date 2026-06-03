@@ -5,7 +5,7 @@ This repository provisions a private Azure infrastructure foundation for a data 
 ## What This Deploys
 
 - Existing Resource Group lookup:
-    - `rg-azure-dataplatform-mvp` (must already exist)
+    - `rg-auzre-dataplatform-mvp` (must already exist)
 - Networking:
     - VNet: `vnet-dataplatform-mvp` (`10.0.0.0/16`)
     - AKS subnet: `snet-aks` (`10.0.1.0/24`)
@@ -43,7 +43,7 @@ az login
     - Container: `tfstate`
     - Key: `mvp.terraform.tfstate`
 - Existing deployment resource group:
-    - `rg-azure-dataplatform-mvp`
+    - `rg-auzre-dataplatform-mvp`
 
 ## Inputs
 
@@ -104,7 +104,7 @@ After apply, Terraform returns:
 To merge cluster credentials into your local kube config:
 
 ```bash
-az aks get-credentials --resource-group rg-azure-dataplatform-mvp --name aks-dataplatform-mvp
+az aks get-credentials --resource-group rg-auzre-dataplatform-mvp --name aks-dataplatform-mvp
 ```
 
 Then verify access:

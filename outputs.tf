@@ -20,7 +20,7 @@ output "aks_kube_config" {
 }
 
 output "postgres_server_name" {
-  value       = azurerm_postgresql_flexible_server.postgres.name
+  value = azurerm_postgresql_flexible_server.postgres.name
 }
 
 output "postgres_private_fqdn" {

@@ -12,7 +12,7 @@ provider "azurerm" {
 }
 
 data "azurerm_resource_group" "rg" {
-  name = "rg-azure-dataplatform-mvp"
+  name = "rg-auzre-dataplatform-mvp"
 }
 
 # ---------------------------------------------------------
@@ -78,7 +78,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
   default_node_pool {
     name           = "default"
     node_count     = 2
-    vm_size        = "Standard_D2_v2"
+    vm_size        = "Standard_D2s_v3"
     vnet_subnet_id = azurerm_subnet.aks_subnet.id
   }
 
@@ -86,7 +86,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
     type = "SystemAssigned"
   }
 
-  
+
   network_profile {
     network_plugin    = "azure"
     load_balancer_sku = "standard"
@@ -109,8 +109,10 @@ resource "azurerm_postgresql_flexible_server" "postgres" {
   storage_mb             = 32768
   sku_name               = "B_Standard_B1ms"
 
-  delegated_subnet_id    = azurerm_subnet.postgres_subnet.id
-  private_dns_zone_id    = azurerm_private_dns_zone.postgres_dns.id
+  public_network_access_enabled = false
+
+  delegated_subnet_id = azurerm_subnet.postgres_subnet.id
+  private_dns_zone_id = azurerm_private_dns_zone.postgres_dns.id
 
   depends_on = [azurerm_private_dns_zone_virtual_network_link.dns_vnet_link]
 }
