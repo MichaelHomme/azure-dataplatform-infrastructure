@@ -1,6 +1,8 @@
 # helm/airflow/values.yaml
 executor: "CeleryExecutor"
 
+webserverSecretKeySecretName: "airflow-webserver-secret"
+
 postgresql:
   enabled: false
 
@@ -10,8 +12,10 @@ data:
 config:
   core:
     load_examples: "False"
-  webserver:
-    secret_key: "ChangeMeToA-Very-Long-Random-String-For-Security"
+  celery:
+    worker_concurrency: "2"
+
+
 
 webserver:
   service:
@@ -22,10 +26,19 @@ workers:
   resources:
     requests:
       cpu: "500m"
-      memory: "512Mi"
+      memory: "1Gi"
     limits:
       cpu: "1000m"
       memory: "1Gi"
 
 rbac:
   create: true
+
+
+dags:
+  gitSync:
+    enabled: true
+    repo: "https://github.com/MichaelHomme/azure-dataplatform-pipelines.git"
+    branch: "main"
+    subPath: "dags"
+    credentialsSecret: "airflow-git-credentials"

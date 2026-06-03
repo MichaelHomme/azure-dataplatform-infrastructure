@@ -14,7 +14,7 @@ This repository provisions a private Azure infrastructure foundation for a data 
     - DNS link from zone to VNet
 - Compute:
     - AKS cluster: `aks-dataplatform-mvp`
-    - Node pool: 2 nodes, `Standard_D2_v2`
+    - Node pool: 2 nodes, `Standard_D2s_v3`
     - Azure CNI (`network_plugin = "azure"`)
 - Data layer:
     - Azure Database for PostgreSQL Flexible Server (private networking only)
@@ -127,7 +127,7 @@ terraform destroy -var="db_admin_password=<strong-password>"
 - Keep secrets out of source control. Prefer environment variables or a secure secret store for `db_admin_password`.
 
 
-## Database Bootstraping
+## Database Bootstrapping
 
 ```bash
 # Create the database for Airflow's internal state
@@ -152,9 +152,12 @@ az aks get-credentials --resource-group rg-azure-dataplatform-mvp --name aks-dat
 # Create a namesapce for Airflow
 kubectl create namespace airflow
 
+# Inject the webserver secret
+kubectl create secret generic airflow-webserver-secret --from-literal=webserver-secret-key="********************************" -n airflow
+
 # Inject the connection string directly into Kubernetes
 kubectl create secret generic my-airflow-db-secret \
-  --from-literal=connection='postgresql+psycopg2://psqladmin:***************@[psql-dataplatform-mvp-783d.postgres.database.azure.com:5432/airflow_metadata](https://psql-dataplatform-mvp-783d.postgres.database.azure.com:5432/airflow_metadata)' \
+  --from-literal=connection='postgresql+psycopg2://psqladmin:***********@psql-dataplatform-mvp-783d.postgres.database.azure.com:5432/airflow_metadata' \
   -n airflow
 
 # Inject DBT database secret
@@ -171,7 +174,7 @@ helm repo update
 helm upgrade --install airflow apache-airflow/airflow --namespace airflow --values helm/airflow/values.yaml
 ```
 
-### Check the running Pods and connect to 
+### Check the running Pods
 ```bash
 # check running pods
 kubectl get pods -n airflow -w
@@ -179,4 +182,7 @@ kubectl get pods -n airflow -w
 kubectl port-forward svc/airflow-api-server 8080:8080 -n airflow
 ```
 
-
+## Inject the GitHub PAT
+```bash
+kubectl create secret generic airflow-git-credentials --from-literal=GIT_SYNC_USERNAME=<github_username> --from-literal=GIT_SYNC_PASSWORD=<your_pat> -n airflow
+```
