@@ -125,3 +125,58 @@ terraform destroy -var="db_admin_password=<strong-password>"
 
 - PostgreSQL is deployed using delegated subnet + private DNS, without public access in this setup.
 - Keep secrets out of source control. Prefer environment variables or a secure secret store for `db_admin_password`.
+
+
+## Database Bootstraping
+
+```bash
+# Create the database for Airflow's internal state
+az postgres flexible-server db create \
+  --resource-group rg-azure-dataplatform-mvp \
+  --server-name psql-dataplatform-mvp-783d \
+  --database-name airflow_metadata
+
+# Create the database for dbt transformations
+az postgres flexible-server db create \
+  --resource-group rg-azure-dataplatform-mvp \
+  --server-name psql-dataplatform-mvp-783d \
+  --database-name data_warehouse
+```
+
+## AKS Cluster Connection & Secrets Ingestion
+
+```bash
+# get credentials
+az aks get-credentials --resource-group rg-azure-dataplatform-mvp --name aks-dataplatform-mvp
+
+# Create a namesapce for Airflow
+kubectl create namespace airflow
+
+# Inject the connection string directly into Kubernetes
+kubectl create secret generic my-airflow-db-secret \
+  --from-literal=connection='postgresql+psycopg2://psqladmin:***************@[psql-dataplatform-mvp-783d.postgres.database.azure.com:5432/airflow_metadata](https://psql-dataplatform-mvp-783d.postgres.database.azure.com:5432/airflow_metadata)' \
+  -n airflow
+
+# Inject DBT database secret
+kubectl create secret generic dbt-postgres-secret \
+  --from-literal=DBT_PASSWORD='fbs_data_plattform' \
+  -n airflow
+```
+## Apache Airflow deployment via Helm
+
+```bash
+# These are identical in PowerShell, Bash, and Zsh
+helm repo add apache-airflow https://airflow.apache.org
+helm repo update
+helm upgrade --install airflow apache-airflow/airflow --namespace airflow --values helm/airflow/values.yaml
+```
+
+### Check the running Pods and connect to 
+```bash
+# check running pods
+kubectl get pods -n airflow -w
+# Test Airflow api-server
+kubectl port-forward svc/airflow-api-server 8080:8080 -n airflow
+```
+
+
