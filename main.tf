@@ -12,7 +12,7 @@ provider "azurerm" {
 }
 
 data "azurerm_resource_group" "rg" {
-  name = "rg-auzre-dataplatform-mvp"
+  name = "rg-azure-dataplatform-mvp"
 }
 
 # ---------------------------------------------------------
@@ -90,6 +90,10 @@ resource "azurerm_kubernetes_cluster" "aks" {
   network_profile {
     network_plugin    = "azure"
     load_balancer_sku = "standard"
+
+    # --- NEW: Explicitly define internal Service IPs so they don't overlap with the VNet ---
+    service_cidr   = "172.16.0.0/16"
+    dns_service_ip = "172.16.0.10" # Must be an IP inside the service_cidr
   }
 }
 
@@ -102,7 +106,7 @@ resource "azurerm_postgresql_flexible_server" "postgres" {
   name                   = "psql-dataplatform-mvp-${random_id.suffix.hex}"
   resource_group_name    = data.azurerm_resource_group.rg.name
   location               = data.azurerm_resource_group.rg.location
-  version                = "14"
+  version                = "15"
   administrator_login    = var.db_admin_username
   administrator_password = var.db_admin_password
   zone                   = "1"
