@@ -1,0 +1,31 @@
+# helm/airflow/values.yaml
+executor: "CeleryExecutor"
+
+postgresql:
+  enabled: false
+
+data:
+  metadataSecretName: "my-airflow-db-secret"
+
+config:
+  core:
+    load_examples: "False"
+  webserver:
+    secret_key: "ChangeMeToA-Very-Long-Random-String-For-Security"
+
+webserver:
+  service:
+    type: ClusterIP
+
+workers:
+  replicas: 1
+  resources:
+    requests:
+      cpu: "500m"
+      memory: "512Mi"
+    limits:
+      cpu: "1000m"
+      memory: "1Gi"
+
+rbac:
+  create: true
