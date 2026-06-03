@@ -162,7 +162,7 @@ kubectl create secret generic my-airflow-db-secret \
 
 # Inject DBT database secret
 kubectl create secret generic dbt-postgres-secret \
-  --from-literal=DBT_PASSWORD='fbs_data_plattform' \
+  --from-literal=DBT_PASSWORD='<strong-password>' \
   -n airflow
 ```
 ## Apache Airflow deployment via Helm
