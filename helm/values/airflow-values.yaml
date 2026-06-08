@@ -1,0 +1,82 @@
+images:
+  airflow:
+    repository: ${MY_ACR_REGISTRY}.azurecr.io/airflow
+    tag: 3.0.2
+    digest: ~
+    pullPolicy: IfNotPresent
+  useDefaultImageForMigration: false
+  migrationsWaitTimeout: 60
+  pod_template:
+    repository: ${MY_ACR_REGISTRY}.azurecr.io/airflow
+    tag: 3.0.2
+    pullPolicy: IfNotPresent
+  flower:
+    repository: ${MY_ACR_REGISTRY}.azurecr.io/airflow
+    tag: 3.0.2
+    pullPolicy: IfNotPresent
+  statsd:
+    repository: ${MY_ACR_REGISTRY}.azurecr.io/statsd-exporter
+    tag: v0.28.0
+    pullPolicy: IfNotPresent
+  pgbouncer:
+    repository: ${MY_ACR_REGISTRY}.azurecr.io/airflow
+    tag: airflow-pgbouncer-2025.03.05-1.23.1
+    pullPolicy: IfNotPresent
+  pgbouncerExporter:
+    repository: ${MY_ACR_REGISTRY}.azurecr.io/airflow
+    tag: airflow-pgbouncer-exporter-2025.03.05-0.18.0
+    pullPolicy: IfNotPresent
+  gitSync:
+    repository: ${MY_ACR_REGISTRY}.azurecr.io/git-sync
+    tag: v4.3.0
+    pullPolicy: IfNotPresent
+
+executor: "KubernetesExecutor"
+
+env:
+  - name: ENVIRONMENT
+    value: dev
+
+extraEnv: |
+  - name: AIRFLOW__CORE__DEFAULT_TIMEZONE
+    value: 'America/New_York'
+
+postgresql:
+  enabled: true
+  image:
+    registry: ${MY_ACR_REGISTRY}.azurecr.io
+    repository: postgresql
+    tag: 16.1.0-debian-11-r15
+
+pgbouncer:
+  enabled: true
+
+dags:
+  gitSync:
+    enabled: true
+    repo: https://github.com/MichaelHomme/azure-dataplatform-pipelines.git
+    branch: main
+    rev: HEAD
+    depth: 1
+    maxFailures: 0
+    subPath: "dags"
+    # Git authentication via PAT stored in Key Vault
+    credentialsSecret: airflow-git-credentials
+
+logs:
+  persistence:
+    enabled: true
+    existingClaim: pvc-airflow-logs
+    storageClassName: azureblob-fuse-premium
+
+triggerer:
+  logGroomerSidecar:
+    enabled: false
+
+scheduler:
+  logGroomerSidecar:
+    enabled: false
+
+workers:
+  logGroomerSidecar:
+    enabled: false
