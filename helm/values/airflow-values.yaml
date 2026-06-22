@@ -1,37 +1,40 @@
 images:
   airflow:
-    repository: ${MY_ACR_REGISTRY}.azurecr.io/airflow
-    tag: 3.0.2
+    repository: ${ACR_REGISTRY}.azurecr.io/airflow
+    tag: 3.2.2
     digest: ~
     pullPolicy: IfNotPresent
   useDefaultImageForMigration: false
   migrationsWaitTimeout: 60
   pod_template:
-    repository: ${MY_ACR_REGISTRY}.azurecr.io/airflow
-    tag: 3.0.2
+    repository: ${ACR_REGISTRY}.azurecr.io/airflow
+    tag: 3.2.2
     pullPolicy: IfNotPresent
   flower:
-    repository: ${MY_ACR_REGISTRY}.azurecr.io/airflow
-    tag: 3.0.2
+    repository: ${ACR_REGISTRY}.azurecr.io/airflow
+    tag: 3.2.2
     pullPolicy: IfNotPresent
   statsd:
-    repository: ${MY_ACR_REGISTRY}.azurecr.io/statsd-exporter
+    repository: ${ACR_REGISTRY}.azurecr.io/statsd-exporter
     tag: v0.28.0
     pullPolicy: IfNotPresent
   pgbouncer:
-    repository: ${MY_ACR_REGISTRY}.azurecr.io/airflow
+    repository: ${ACR_REGISTRY}.azurecr.io/airflow
     tag: airflow-pgbouncer-2025.03.05-1.23.1
     pullPolicy: IfNotPresent
   pgbouncerExporter:
-    repository: ${MY_ACR_REGISTRY}.azurecr.io/airflow
+    repository: ${ACR_REGISTRY}.azurecr.io/airflow
     tag: airflow-pgbouncer-exporter-2025.03.05-0.18.0
     pullPolicy: IfNotPresent
   gitSync:
-    repository: ${MY_ACR_REGISTRY}.azurecr.io/git-sync
+    repository: ${ACR_REGISTRY}.azurecr.io/git-sync
     tag: v4.3.0
     pullPolicy: IfNotPresent
 
 executor: "KubernetesExecutor"
+
+# Disable the default airflow_local_settings.py (incompatible with Airflow 3.x)
+airflowLocalSettings: ~
 
 env:
   - name: ENVIRONMENT
@@ -39,12 +42,12 @@ env:
 
 extraEnv: |
   - name: AIRFLOW__CORE__DEFAULT_TIMEZONE
-    value: 'America/New_York'
+    value: 'Europe/Oslo'
 
 postgresql:
   enabled: true
   image:
-    registry: ${MY_ACR_REGISTRY}.azurecr.io
+    registry: ${ACR_REGISTRY}.azurecr.io
     repository: postgresql
     tag: 16.1.0-debian-11-r15
 

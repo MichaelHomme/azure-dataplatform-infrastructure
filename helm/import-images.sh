@@ -33,10 +33,10 @@ az acr import --name "$ACR_REGISTRY" \
   --source quay.io/prometheus/statsd-exporter:v0.28.0 \
   --image statsd-exporter:v0.28.0
 
-echo "  [5/6] airflow:3.0.2"
+echo "  [5/6] airflow:3.2.2"
 az acr import --name "$ACR_REGISTRY" \
-  --source docker.io/apache/airflow:3.0.2 \
-  --image airflow:3.0.2
+  --source docker.io/apache/airflow:3.2.2 \
+  --image airflow:3.2.2
 
 echo "  [6/6] git-sync:v4.3.0"
 az acr import --name "$ACR_REGISTRY" \

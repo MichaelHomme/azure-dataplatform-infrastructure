@@ -19,7 +19,7 @@ spec:
     readOnly: false
     volumeHandle: airflow-logs-1
     volumeAttributes:
-      resourceGroup: "${MY_RESOURCE_GROUP_NAME}"
+      resourceGroup: "${RESOURCE_GROUP_NAME}"
       storageAccount: "${AKS_AIRFLOW_LOGS_STORAGE_ACCOUNT_NAME}"
       containerName: "${AKS_AIRFLOW_LOGS_STORAGE_CONTAINER_NAME}"
     nodeStageSecretRef:

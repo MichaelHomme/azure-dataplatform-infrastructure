@@ -13,11 +13,11 @@ render_template() {
   local file="$1"
   local content
   content=$(<"$file")
-  content="${content//\$\{MY_RESOURCE_GROUP_NAME\}/$MY_RESOURCE_GROUP_NAME}"
-  content="${content//\$\{MY_IDENTITY_NAME_CLIENT_ID\}/$MY_IDENTITY_NAME_CLIENT_ID}"
-  content="${content//\$\{MY_IDENTITY_NAME_PRINCIPAL_ID\}/$MY_IDENTITY_NAME_PRINCIPAL_ID}"
-  content="${content//\$\{MY_ACR_REGISTRY\}/$MY_ACR_REGISTRY}"
-  content="${content//\$\{MY_KEYVAULT_NAME\}/$MY_KEYVAULT_NAME}"
+  content="${content//\$\{RESOURCE_GROUP_NAME\}/$RESOURCE_GROUP_NAME}"
+  content="${content//\$\{IDENTITY_NAME_CLIENT_ID\}/$IDENTITY_NAME_CLIENT_ID}"
+  content="${content//\$\{IDENTITY_NAME_PRINCIPAL_ID\}/$IDENTITY_NAME_PRINCIPAL_ID}"
+  content="${content//\$\{ACR_REGISTRY\}/$ACR_REGISTRY}"
+  content="${content//\$\{KEYVAULT_NAME\}/$KEYVAULT_NAME}"
   content="${content//\$\{KEYVAULTURL\}/$KEYVAULTURL}"
   content="${content//\$\{OIDC_URL\}/$OIDC_URL}"
   content="${content//\$\{AKS_AIRFLOW_LOGS_STORAGE_ACCOUNT_NAME\}/$AKS_AIRFLOW_LOGS_STORAGE_ACCOUNT_NAME}"
@@ -31,13 +31,13 @@ render_template() {
 
 # Validate required environment variables
 REQUIRED_VARS=(
-  MY_RESOURCE_GROUP_NAME
-  MY_IDENTITY_NAME
-  MY_IDENTITY_NAME_CLIENT_ID
-  MY_IDENTITY_NAME_PRINCIPAL_ID
-  MY_ACR_REGISTRY
-  MY_KEYVAULT_NAME
-  MY_CLUSTER_NAME
+  RESOURCE_GROUP_NAME
+  IDENTITY_NAME
+  IDENTITY_NAME_CLIENT_ID
+  IDENTITY_NAME_PRINCIPAL_ID
+  ACR_REGISTRY
+  KEYVAULT_NAME
+  CLUSTER_NAME
   KEYVAULTURL
   OIDC_URL
   AKS_AIRFLOW_LOGS_STORAGE_ACCOUNT_NAME
@@ -63,8 +63,8 @@ echo "========================================="
 echo ""
 echo "[1/7] Connecting to AKS cluster..."
 az aks get-credentials \
-  --resource-group "$MY_RESOURCE_GROUP_NAME" \
-  --name "$MY_CLUSTER_NAME" \
+  --resource-group "$RESOURCE_GROUP_NAME" \
+  --name "$CLUSTER_NAME" \
   --overwrite-existing
 
 # Step 2: Create namespace and service account
@@ -79,8 +79,8 @@ echo ""
 echo "[3/7] Creating federated credential..."
 az identity federated-credential create \
   --name external-secret-operator \
-  --identity-name "$MY_IDENTITY_NAME" \
-  --resource-group "$MY_RESOURCE_GROUP_NAME" \
+  --identity-name "$IDENTITY_NAME" \
+  --resource-group "$RESOURCE_GROUP_NAME" \
   --issuer "$OIDC_URL" \
   --subject "system:serviceaccount:${AKS_AIRFLOW_NAMESPACE}:${SERVICE_ACCOUNT_NAME}" \
   --output table 2>/dev/null || echo "Federated credential already exists."
@@ -128,7 +128,7 @@ render_template "$SCRIPT_DIR/values/airflow-values.yaml" > /tmp/airflow-values-r
 
 helm upgrade --install airflow \
   apache-airflow/airflow \
-  --version 1.15.0 \
+  --version 1.22.0 \
   --namespace "$AKS_AIRFLOW_NAMESPACE" \
   --create-namespace \
   -f /tmp/airflow-values-rendered.yaml \
