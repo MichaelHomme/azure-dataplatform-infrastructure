@@ -45,3 +45,11 @@ resource "azurerm_key_vault_secret" "storage_account_key" {
 
   depends_on = [azurerm_key_vault_access_policy.terraform_deployer]
 }
+
+resource "azurerm_key_vault_secret" "airflow_git_pat" {
+  name         = var.airflow_git_pat_secret_name
+  value        = var.airflow_git_pat
+  key_vault_id = azurerm_key_vault.airflow.id
+
+  depends_on = [azurerm_key_vault_access_policy.terraform_deployer]
+}

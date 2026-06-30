@@ -1,17 +1,17 @@
 images:
   airflow:
-    repository: ${ACR_REGISTRY}.azurecr.io/airflow
+    repository: apache/airflow
     tag: 3.2.2
     digest: ~
     pullPolicy: IfNotPresent
   useDefaultImageForMigration: false
   migrationsWaitTimeout: 60
   pod_template:
-    repository: ${ACR_REGISTRY}.azurecr.io/airflow
+    repository: apache/airflow
     tag: 3.2.2
     pullPolicy: IfNotPresent
   flower:
-    repository: ${ACR_REGISTRY}.azurecr.io/airflow
+    repository: apache/airflow
     tag: 3.2.2
     pullPolicy: IfNotPresent
   statsd:
@@ -71,6 +71,14 @@ logs:
     enabled: true
     existingClaim: pvc-airflow-logs
     storageClassName: azureblob-fuse-premium
+
+# Disable Helm hook jobs — both are run explicitly in deploy.sh to avoid silent
+# failures when the ACR image isn't yet accessible during hook execution.
+migrateDatabaseJob:
+  enabled: false
+
+createUserJob:
+  enabled: false
 
 triggerer:
   logGroomerSidecar:

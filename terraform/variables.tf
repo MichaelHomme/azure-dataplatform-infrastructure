@@ -153,3 +153,15 @@ variable "keyvault_sku" {
   type        = string
   default     = "standard"
 }
+
+variable "airflow_git_pat" {
+  description = "GitHub Personal Access Token used by git-sync to clone private DAG repositories"
+  type        = string
+  sensitive   = true
+}
+
+variable "airflow_git_pat_secret_name" {
+  description = "Key Vault secret name for the Airflow git-sync PAT"
+  type        = string
+  default     = "airflow-git-pat"
+}
